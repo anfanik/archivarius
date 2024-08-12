@@ -1,0 +1,85 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+env:
+  IMAGE_NAME: archivarius
+
+jobs:
+  build-application:
+    name: Build application
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: actions/setup-java@v4
+        name: Set up JDK
+        with:
+          java-version: 17
+          distribution: zulu
+
+      - uses: gradle/actions/setup-gradle@v3
+        name: Set up Gradle
+        with:
+          dependency-graph: generate-and-submit
+
+      - name: Build application
+        run: ./gradlew --init-script .github/gradle/init.gradle.kts build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_DEPENDENCY_GRAPH_JOB_ID: ${{ github.run_id }}
+          GITHUB_DEPENDENCY_GRAPH_JOB_CORRELATOR: ${{ env.IMAGE_NAME }}
+          GITHUB_DEPENDENCY_GRAPH_REF: ${{ github.ref }}
+          GITHUB_DEPENDENCY_GRAPH_SHA: ${{ github.sha }}
+          GITHUB_DEPENDENCY_GRAPH_WORKSPACE: ${{ github.workspace }}
+
+      - uses: actions/upload-artifact@v4
+        name: Upload build artifacts
+        with:
+          name: artifacts
+          path: build/libs
+        continue-on-error: true
+  create-image:
+    name: Create image
+    needs: build-application
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: actions/download-artifact@v4
+        name: Download build artifacts
+        with:
+          name: artifacts
+          path: build/libs
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Log in to registry
+        if: ${{ github.event_name == 'push' }}
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login rg.pl-waw.scw.cloud/namespace-anfanik -u nologin --password-stdin
+
+      - name: Push image
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          IMAGE_ID=rg.pl-waw.scw.cloud/namespace-anfanik/$IMAGE_NAME
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          
+          IMAGE_VERSION=${{ github.ref_name == 'main' && 'stable' || 'latest' }}
+          
+          echo IMAGE_ID=$IMAGE_ID
+          echo IMAGE_VERSION=IMAGE_VERSION
+          
+          docker tag $IMAGE_NAME $IMAGE_ID:$IMAGE_VERSION
+          docker push $IMAGE_ID:$IMAGE_VERSION
