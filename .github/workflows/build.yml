@@ -21,8 +21,8 @@ jobs:
       - uses: actions/setup-java@v4
         name: Set up JDK
         with:
-          java-version: 17
-          distribution: zulu
+          java-version: 22
+          distribution: oracle
 
       - uses: gradle/actions/setup-gradle@v3
         name: Set up Gradle
@@ -30,7 +30,7 @@ jobs:
           dependency-graph: generate-and-submit
 
       - name: Build application
-        run: ./gradlew build
+        run: ./gradlew --init-script .github/gradle/init.gradle.kts build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_DEPENDENCY_GRAPH_JOB_ID: ${{ github.run_id }}
