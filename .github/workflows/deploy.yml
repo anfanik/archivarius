@@ -39,3 +39,4 @@ jobs:
           
           echo Deployment name: $DEPLOYMENT_NAME
           kubectl rollout restart deployment/$DEPLOYMENT_NAME
+        continue-on-error: true
