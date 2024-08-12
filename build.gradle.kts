@@ -54,7 +54,7 @@ tasks.apply {
     }
     withType(KotlinCompile::class) {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_22)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
