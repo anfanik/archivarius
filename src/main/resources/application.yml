@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: archivarius
+
+  jackson:
+    default-property-inclusion: non_null
+    date-format: "yyyy-MM-dd'T'HH:mm:ssZ"
+    serialization:
+      write_dates_as_timestamps: "false"
+
+  jpa:
+    properties:
+      hibernate:
+        auto_quote_keyword: true
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema/*
+
+server:
+  servlet:
+    context-path: /api

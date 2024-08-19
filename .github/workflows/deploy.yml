@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to environment
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      url: ${{ vars.DEPLOYMENT_URL }}
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: azure/k8s-set-context@v3
+        name: Initialize kubectl
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Apply deployment
+        run: |
+          DEPLOYMENT_FILE=${{ vars.DEPLOYMENT_FILE }}
+          
+          echo Deployment file: $DEPLOYMENT_FILE
+          kubectl apply -f $DEPLOYMENT_FILE
+
+      - name: Rollout and restart deployment
+        run: |
+          DEPLOYMENT_NAME=${{ vars.DEPLOYMENT_NAME }}
+          
+          echo Deployment name: $DEPLOYMENT_NAME
+          kubectl rollout restart deployment/$DEPLOYMENT_NAME

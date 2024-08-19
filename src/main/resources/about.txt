@@ -1,0 +1,38 @@
+# archivarius
+
+Archivarius is a simple paste-service written on Kotlin and Spring.
+
+Store and share text snippets easily.
+
+## Basic Usage
+
+Type what you want to share, click "Save", and then copy the URL. Send that
+URL to someone and they'll see what you see.
+
+To make a new entry, click "New" (or type 'control + n')
+
+## Duration
+
+Pastes will stay for 30 days from their last view. They may be removed earlier
+and without notice.
+
+## Privacy
+
+While the contents of paste.anfanik.me are not directly crawled by any search robot
+that obeys "robots.txt", there should be no great expectation of privacy. Post
+things at your own risk. Not responsible for any loss of data or removed
+pastes.
+
+## Open Source
+
+Archivarius can easily be installed behind your network, and it's all open source!
+
+* [backend](https://github.com/anfanik/archivarius)
+* [frontend](https://github.com/anfanik/archivarius-frontend)
+
+## Author
+
+Code by Andrew Anfanik <me@anfanik.me>
+Design by Danila "ONE1SIDE" Sigeev <markofthetimes@gmail.com>
+
+Inspired by hastebin
