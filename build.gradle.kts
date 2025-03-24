@@ -41,7 +41,7 @@ dependencies {
 }
 
 dependencyManagement {
-    val springCloudVersion = "2024.0.0"
+    val springCloudVersion = "2024.0.1"
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
     }
