@@ -6,6 +6,7 @@ on:
   pull_request:
 env:
   IMAGE_NAME: archivarius
+  VERSION: 1.0.0
 
 jobs:
   build-application:
@@ -45,6 +46,7 @@ jobs:
           name: artifacts
           path: build/libs
         continue-on-error: true
+
   create-image:
     name: Create image
     needs: build-application
@@ -71,14 +73,14 @@ jobs:
           path: build/libs
 
       - name: Log in to registry
-        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login rg.pl-waw.scw.cloud/namespace-anfanik -u nologin --password-stdin
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login nexus.implario.dev/implario-docker-deploy -u ${{ vars.REGISTRY_USERNAME }} --password-stdin
 
       - name: Build and push multi-arch image
         run: |
-          IMAGE_ID=rg.pl-waw.scw.cloud/namespace-anfanik/$IMAGE_NAME
+          IMAGE_ID=nexus.implario.dev/implario-docker-deploy/$IMAGE_NAME
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           
-          IMAGE_VERSION=${{ github.ref_name == 'main' && 'stable' || 'latest' }}
+          IMAGE_VERSION=$VERSION
           
           echo "IMAGE_ID=$IMAGE_ID"
           echo "IMAGE_VERSION=$IMAGE_VERSION"
