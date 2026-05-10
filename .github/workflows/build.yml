@@ -73,7 +73,7 @@ jobs:
           path: build/libs
 
       - name: Log in to registry
-        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login nexus.implario.dev/implario-docker-deploy -u ${{ vars.REGISTRY_USERNAME }} --password-stdin
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login nexus.implario.dev -u ${{ vars.REGISTRY_USERNAME }} --password-stdin
 
       - name: Build and push multi-arch image
         run: |
